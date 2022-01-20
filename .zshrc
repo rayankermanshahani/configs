@@ -7,4 +7,17 @@ alias ls='ls -1G'
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
-export PATH=$PATH:~/Library/Python/3.8/bin
+# Intel homebrew (old) command: brow 
+alias brow='arch --x86_64 /usr/local/Homebrew/bin/brew' 
+path=('/usr/local/Homebrew/bin/brew' $path) 
+export PATH
+
+# Apple Silicon Homebrew 
+path=('/opt/homebrew/bin' $path) 
+export PATH
+
+# adding solana to path
+PATH='/Users/rayker/Developer/solana/bin':$PATH
+
+
+

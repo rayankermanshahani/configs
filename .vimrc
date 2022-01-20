@@ -52,9 +52,22 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'pangloss/vim-javascript'
 "}}
 
+"{{ TypeScript syntax 
+Plug 'leafgarland/typescript-vim'
+"}}
+
 "{{ Solidity syntax highlighting 
 Plug 'TovarishFin/vim-solidity'
 "}}
+
+"{{ Go language support & syntax highlighting 
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+"}} 
+
+"{{ Rust language support & syntax highlighting 
+Plug 'rust-lang/rust.vim'
+"}} 
+
 
 call plug#end()
 
