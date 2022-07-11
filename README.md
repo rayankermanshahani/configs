@@ -1,1 +1,1 @@
-Configuration files for my workflow. 
+Configuration files for workflow. 
