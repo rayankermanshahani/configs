@@ -1,6 +1,11 @@
 syntax on
 
-" set mouse=a 
+"crosshairs
+hi CursorColumn cterm=NONE ctermbg=235
+hi CursorLine cterm=NONE ctermbg=235
+:set cursorline! cursorcolumn!
+
+"set mouse=a 
 
 set re=0 
 
@@ -10,10 +15,10 @@ set background=dark
 
 set nocompatible
 
-set tabstop=2 softtabstop=2
-set shiftwidth=2
+set tabstop=4 softtabstop=4
+set shiftwidth=4
 set expandtab
-set smartindent
+"set smartindent
 set ai 
 
 set number
@@ -60,14 +65,13 @@ Plug 'leafgarland/typescript-vim'
 Plug 'TovarishFin/vim-solidity'
 "}}
 
-"{{ Go language support & syntax highlighting 
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-"}} 
+"{{ Vyper syntax highlighting 
+Plug 'vyperlang/vim-vyper'
+"}}
 
 "{{ Rust language support & syntax highlighting 
 Plug 'rust-lang/rust.vim'
 "}} 
-
 
 call plug#end()
 

@@ -1,8 +1,11 @@
 autoload -U colors && colors 
 
-PS1="%{$fg[cyan]%}%n@%m%{$reset_color%}: %{$fg[yellow]%}%(4~|.../%3~|%~) %{$reset_color%}$ "
+PS1="%{$fg[cyan]%}%n@%m%{$reset_color%}:%{$fg[yellow]%}%~%{$reset_color%}$ "
 
 alias ls='ls -1G'
+
+# opening directory/file in VSCodium
+alias vsc="open $1 -a "VSC""
 
 export VISUAL=vim
 export EDITOR="$VISUAL"
@@ -16,8 +19,9 @@ export PATH
 path=('/opt/homebrew/bin' $path) 
 export PATH
 
-# adding solana to path
-PATH='/Users/rayker/Developer/solana/bin':$PATH
 
+# tabtab source for packages
+# uninstall by removing these lines
+[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
-
+export PATH="$PATH:/Users/rayker/.foundry/bin"
