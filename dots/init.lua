@@ -62,7 +62,20 @@ vim.cmd 'call plug#begin(\'~/.config/nvim/plugged\')'
 vim.cmd 'Plug \'neovim/nvim-lspconfig\''
 vim.cmd 'Plug \'alvan/vim-closetag\''
 vim.g.closetag_filenames = '*.html,*.xhtml,*.xml,*.vue,*.phtml,*.js,*.jsx,*.coffee,*.erb'
-vim.cmd 'Plug \'rust-lang/rust.vim\''
-vim.cmd 'Plug \'bfrg/vim-cpp-modern\''
+-- vim.cmd 'Plug \'rust-lang/rust.vim\''
+-- vim.cmd 'Plug \'bfrg/vim-cpp-modern\''
 
 vim.cmd 'call plug#end()'
+
+-- python lsp
+require'lspconfig'.pyright.setup{}
+-- typescript (javascript) lsp
+require'lspconfig'.tsserver.setup{}
+-- c/c++
+require("lspconfig").clangd.setup{}
+-- html lsp
+require'lspconfig'.html.setup{}
+-- rust lsp
+require'lspconfig'.rust_analyzer.setup{}
+-- go lsp
+require'lspconfig'.gopls.setup{}

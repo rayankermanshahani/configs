@@ -5,15 +5,18 @@ PS1="%{$fg[cyan]%}%n@%m%{$reset_color%}:%{$fg[yellow]%}%~%{$reset_color%}$ "
 alias ls='ls -1G --color'
 
 # too lazy to type nvim
-alias vim="nvim"
-alias vi="nvim"
-alias oldvim="vim"
+# alias vim="nvim"
+# alias vi="nvim"
+# alias oldvim="vim"
 
 # lazy git
 alias gitup="~/scripts/gitup $1"
 
 export VISUAL=nvim
 export EDITOR="$VISUAL"
+
+# activate python uv venv
+alias vact=". ./.venv/bin/activate"
 
 # Intel homebrew (old) command: brow 
 alias brow='arch --x86_64 /usr/local/Homebrew/bin/brew' 
@@ -44,3 +47,13 @@ export PATH="$PATH:/Users/rayker/Library/Python/3.10/bin"
 
 alias ranger='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
 . "$HOME/.cargo/env"
+
+# bun completions
+[ -s "/Users/rayker/.bun/_bun" ] && source "/Users/rayker/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# opam configuration
+[[ ! -r /Users/rayker/.opam/opam-init/init.zsh ]] || source /Users/rayker/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
