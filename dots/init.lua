@@ -6,7 +6,7 @@
  vim.o.expandtab = true
  vim.o.autoindent = true
  vim.o.smartindent = true
-  vim.o.background = 'dark'
+ vim.o.background = 'light'
  
  -- Search highlighting
  vim.o.hlsearch = true
