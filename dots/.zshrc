@@ -1,15 +1,14 @@
-autoload -U colors && colors 
+autoload -Uz colors && colors 
 
 # PS1="%{$fg[cyan]%}%n@%m%{$reset_color%}:%{$fg[yellow]%}%~%{$reset_color%}$ "
 PS1="%n@%m:%~$ "
 
+setopt autocd
+bindkey -v
+
 alias ..='cd ..'
 alias ls='ls -1G --color'
-
-# too lazy to type nvim
-alias vim="nvim"
-alias vi="nvim"
-alias oldvim="vim"
+alias space="du -h --max-depth=1 | sort -hr"
 
 # lazy git
 alias gitup="~/scripts/gitup $1"
@@ -69,6 +68,6 @@ esac
 # pnpm end
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
-# clean ssh into my deep learning rig named 'box'
+# clean ssh into my rig 
 alias box="~/scripts/connect_box.sh"
 
