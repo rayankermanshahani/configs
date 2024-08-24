@@ -1,38 +1,20 @@
 #!/bin/zsh
 
-# check if a command exists 
+# Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# create directories if they don't exist
-mkdir -p ./brew
-mkdir -p ./pacman
-mkdir -p ./dots
+# Run config dump script
+./config_dump.sh
 
-# check if using macos (brew exists) or arch linux (pacman exists)
+# Check the OS and run the appropriate package dump script
 if command_exists brew; then
-    echo "detected macOS environment"
-    brew leaves > ./brew/my_leaves
-    brew list --casks > ./brew/my_casks
+    ./macos_dump.sh
 elif command_exists pacman; then
-    echo "detected arch linux environment"
-    pacman -Qe > ./pacman/explicit_packages
-    if command_exists yay; then
-        yay -Qm > ./pacman/aur_packages
-    else
-        echo "yay not found, skipping AUR package list"
-    fi
+    ./arch_dump.sh
 else
-    echo "neither brew nor pacman found. unsupported environment."
-    exit 1
+    echo "Unsupported operating system. Package dump skipped."
 fi
 
-# copy config files (common for both envs)
-cp ~/.vimrc ./dots/.vimrc
-cp ~/.config/nvim/init.lua ./dots/init.lua
-cp ~/.zshrc ./dots/.zshrc
-cp ~/.tmux.conf ./dots/.tmux.conf
-cp ~/.clang-format ./dots/.clang-format
-
-echo "dump completed successfully."
+echo "All dump operations completed!"
