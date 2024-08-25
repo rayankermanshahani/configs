@@ -19,15 +19,6 @@ export EDITOR="$VISUAL"
 # activate python uv venv
 alias vact=". ./.venv/bin/activate"
 #
-# Intel homebrew (old) command: brow 
-alias brow='arch --x86_64 /usr/local/Homebrew/bin/brew' 
-path=('/usr/local/Homebrew/bin/brew' $path) 
-export PATH
-
-# Apple Silicon Homebrew 
-path=('/opt/homebrew/bin' $path) 
-export PATH
-
 
 # tabtab source for packages
 # uninstall by removing these lines
@@ -36,7 +27,6 @@ export PATH
 export PATH="$PATH:/Users/rayker/.foundry/bin"
 
 export NVM_DIR="$HOME/.nvm"
-source $(brew --prefix nvm)/nvm.sh
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
