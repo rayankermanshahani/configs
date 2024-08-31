@@ -1,91 +1,114 @@
- -- Basic settings
- vim.o.syntax = 'on'
- vim.o.number = true
- vim.o.tabstop = 4
- vim.o.shiftwidth = 4
- vim.o.expandtab = true
- vim.o.autoindent = true
- vim.o.smartindent = true
- vim.o.background = 'light'
- 
- -- Search highlighting
- vim.o.hlsearch = true
- 
- 
- -- Additional visual settings
- vim.o.cursorline = true
- vim.o.cursorcolumn = true
- 
- -- Custom crosshair highlights
- vim.cmd('highlight CursorLine guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
- vim.cmd('highlight CursorColumn guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
- 
- 
- -- Highlight matching parentheses and brackets with a shade of yellow
- vim.cmd('highlight MatchParen guibg=NONE guifg=#FFFF00 cterm=bold ctermbg=NONE ctermfg=Yellow')
+-- bootstrap lazy.nvim (PLUGIN MANAGER)
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
+end
+vim.opt.rtp:prepend(lazypath)
 
--- Split window settings
-vim.o.splitright = true
-vim.o.splitbelow = true
+-- general ui configurations
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
 
--- Additional UI tweaks
+-- line numbers default
+vim.o.number = true
+
+-- search highlighting 
+vim.o.hlsearch = true
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- displaying certain whitespace characters 
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+-- custom crosshair highlighting
+vim.o.cursorline = true
+vim.o.cursorcolumn = true
+vim.cmd('highlight CursorLine guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
+vim.cmd('highlight CursorColumn guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
+
+-- highlight matching parentheses
+vim.cmd('highlight MatchParen guibg=NONE guifg=#FFFF00 cterm=bold ctermbg=NONE ctermfg=Yellow')
+
+-- additional ui tweaks
+vim.o.syntax = 'on'
+vim.o.number = true
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.autoindent = true
+vim.o.smartindent = true
+vim.o.breakindent = true
+vim.o.background = 'light'
 vim.o.showcmd = true
 vim.o.showmatch = true
 vim.o.wildmenu = true
 vim.o.lazyredraw = true
 vim.o.ttyfast = true
-
--- Custom highlights
+vim.o.scrolloff = 10
 vim.cmd('highlight Comment ctermfg=DarkGray')
 vim.cmd('highlight Keyword ctermfg=Blue')
 vim.cmd('highlight String ctermfg=DarkGreen')
 
--- Plugin management using packer.nvim
-require('packer').startup(function()
+-- setup lazy.nvim
+require("lazy").setup({
+  spec = {
+    -- better statusline
+    'vim-airline/vim-airline',
 
-  -- Packer can manage itself
-  use 'wbthomason/packer.nvim'
+    -- zig language zupport
+    'ziglang/zig.vim',
 
-  -- Example plugin for better status line
-  use 'vim-airline/vim-airline'
+    -- lsp and autocomplete
+    {
+      'neovim/nvim-lspconfig',  -- Collection of configurations for built-in LSP client
+      'hrsh7th/nvim-cmp',       -- Autocompletion plugin
+      'hrsh7th/cmp-nvim-lsp',   -- LSP source for nvim-cmp
+      'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp
+      'L3MON4D3/LuaSnip',       -- Snippets plugin
+      'hrsh7th/cmp-buffer',     -- Buffer completions
+      'hrsh7th/cmp-path',       -- Path completions
+      'hrsh7th/cmp-cmdline',    -- Command line completions
+      'hrsh7th/cmp-vsnip',      -- VSnip source for nvim-cmp
+      'hrsh7th/vim-vsnip',      -- Snippets plugin
+      'ray-x/lsp_signature.nvim', -- Function signature hints
+    },
 
-    use 'ziglang/zig.vim'
+    -- better syntax highlighting
+    {
+      'nvim-treesitter/nvim-treesitter',
+      build = ':TSUpdate',
+      event = 'BufRead',
+      config = function()
+        require('nvim-treesitter.configs').setup {
+          highlight = {
+            enable = true,
+          }
+        }
+      end
+    },
 
-  use {
-    'neovim/nvim-lspconfig',  -- Collection of configurations for built-in LSP client
-    'hrsh7th/nvim-cmp',       -- Autocompletion plugin
-    'hrsh7th/cmp-nvim-lsp',   -- LSP source for nvim-cmp
-    'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp
-    'L3MON4D3/LuaSnip',       -- Snippets plugin
-    'hrsh7th/cmp-buffer',     -- Buffer completions
-    'hrsh7th/cmp-path',       -- Path completions
-    'hrsh7th/cmp-cmdline',    -- Command line completions
-    'hrsh7th/cmp-vsnip',      -- VSnip source for nvim-cmp
-    'hrsh7th/vim-vsnip',      -- Snippets plugin
-    'ray-x/lsp_signature.nvim', -- Function signature hints
-  }
+    -- add more plugins here
+  },
+  -- Configure any other settings here. See the documentation for more details.
+  -- colorscheme that will be used when installing plugins.
+  install = { colorscheme = { "habamax" } },
+  -- automatically check for plugin updates
+  checker = { enabled = true },
+})
 
-  use 'nvim-treesitter/nvim-treesitter'
-
-  -- markdown preview 
-  use 'iamcco/markdown-preview.nvim'
-
-end)
-
--- Configure LSP
-local lspconfig = require('lspconfig')
-
--- Autocompletion setup
+-- autocompletion setup
 local cmp = require'cmp'
 local luasnip = require'luasnip'
-
-local treesitter = require('nvim-treesitter')
-
-treesitter.setup{
-    highlight = {
-        enable = true,
-    }
-}
 
 cmp.setup{
   snippet = {
@@ -127,14 +150,14 @@ cmp.setup{
   })
 }
 
--- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+-- use buffer source for `/`
 cmp.setup.cmdline('/', {
   sources = {
     { name = 'buffer' }
   }
 })
 
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+-- use cmdline & path source for `:`
 cmp.setup.cmdline(':', {
   sources = cmp.config.sources({
     { name = 'path' }
@@ -143,89 +166,28 @@ cmp.setup.cmdline(':', {
   })
 })
 
--- Configure lsp_signature
+-- configure lsp_signature
 require'lsp_signature'.setup({
   bind = true,
   floating_window = true,
   hint_enable = true,
   hint_prefix = {
-      above = "↙ ", -- when hint is on the line above current line
-      current = "← ", -- when hint is on the line above current line
-      below = "↖ ", -- when hint is on the line above current line
+      above = "↙ ",
+      current = "← ",
+      below = "↖ ",
   },
   handler_opts = {
     border = "single"
   }
 })
 
--- Python LSP
-lspconfig.pyright.setup{}
---
--- Elixir LSP
-lspconfig.elixirls.setup{
-    cmd =  { '/opt/homebrew/bin/elixir-ls' }
-}
+-- configure LSP
+local lspconfig = require('lspconfig')
+lspconfig.pyright.setup{} -- python support
+lspconfig.clangd.setup{} -- c/c++ support
+lspconfig.gopls.setup{} -- golang support
+lspconfig.lua_ls.setup{} -- lua support
+lspconfig.tsserver.setup{} -- ts/js support
+lspconfig.zls.setup{} -- zig support
 
--- C/C++ LSP
-lspconfig.clangd.setup{
-  on_attach = function(client, bufnr)
-    -- Keybindings for LSP
-    local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-    local opts = { noremap = true, silent = true }
 
-    -- Key mappings
-    buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    buf_set_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    buf_set_keymap('n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    buf_set_keymap('n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-    buf_set_keymap('n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-    buf_set_keymap('n', '<leader>so', [[<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>]], opts)
-    vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
-  end,
-
-  flags = {
-    debounce_text_changes = 150,
-  }
-}
-
--- JavaScript/TypeScript LSP
-lspconfig.tsserver.setup{}
-
--- Golang LSP
-lspconfig.gopls.setup{}
-
--- Example for configuring Lua LSP
-lspconfig.lua_ls.setup{
-  settings = {
-    Lua = {
-      diagnostics = {
-        globals = {'vim'}
-      }
-    }
-  }
-}
-
--- zig lsp
-lspconfig.zls.setup({
-    on_attach = function(client, bufnr)
-        -- Add any custom on_attach functions here, if you have any
-    end,
-    flags = {
-        debounce_text_changes = 150,
-    },
-    settings = {
-        zls = {
-            enable_inlay_hints = true, -- Enable inlay hints for Zig (optional)
-            inlay_hints_show_builtin = true, -- Show hints for builtin types
-        },
-    },
-})

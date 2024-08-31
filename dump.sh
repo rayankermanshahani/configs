@@ -5,8 +5,13 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Run config dump script
-./config_dump.sh
+# copy neovim config
+cp ~/.config/nvim/init.lua ./dots/init.lua 
+echo "copied neovim config"
+#
+# copy tmux config
+cp ~/.tmux.conf ./dots/.tmux.conf 
+echo "copied tmux config"
 
 # Check the OS and run the appropriate package dump script
 if command_exists brew; then
@@ -14,7 +19,7 @@ if command_exists brew; then
 elif command_exists pacman; then
     ./arch_dump.sh
 else
-    echo "Unsupported operating system. Package dump skipped."
+    echo "unsupported os: package dump skipped."
 fi
 
-echo "All dump operations completed!"
+echo "dumps complete."
