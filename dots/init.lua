@@ -16,6 +16,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- general ui configurations
+vim.cmd("colorscheme habamax")
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
@@ -37,7 +38,7 @@ vim.o.cursorcolumn = true
 --vim.cmd('highlight CursorColumn guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
 vim.cmd('highlight CursorLine guibg=#303030 guifg=NONE cterm=NONE ctermbg=236')
 vim.cmd('highlight CursorColumn guibg=#303030 guifg=NONE cterm=NONE ctermbg=236')
-vim.cmd('highlight Cursor guibg=#1A1A1A guifg=NONE cterm=NONE ctermbg=234')
+vim.cmd('highlight Cursor guibg=#303030  guifg=NONE cterm=NONE ctermbg=236')
 
 
 -- highlight matching parentheses
@@ -46,8 +47,8 @@ vim.cmd('highlight MatchParen guibg=NONE guifg=#FFFF00 cterm=bold ctermbg=NONE c
 -- additional ui tweaks
 vim.o.syntax = 'on'
 vim.o.number = true
-vim.o.tabstop = 4
-vim.o.shiftwidth = 4
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
 vim.o.expandtab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -60,8 +61,8 @@ vim.o.lazyredraw = true
 vim.o.ttyfast = true
 vim.o.scrolloff = 10
 vim.cmd('highlight Comment ctermfg=DarkGray')
-vim.cmd('highlight Keyword ctermfg=Blue')
-vim.cmd('highlight String ctermfg=DarkGreen')
+--vim.cmd('highlight Keyword ctermfg=Blue')
+--vim.cmd('highlight String ctermfg=DarkGreen')
 
 -- setup lazy.nvim
 require("lazy").setup({
@@ -100,6 +101,8 @@ require("lazy").setup({
         }
       end
     },
+
+    'ellisonleao/gruvbox.nvim'
 
     -- add more plugins here
   },
@@ -194,4 +197,26 @@ lspconfig.lua_ls.setup{} -- lua support
 lspconfig.tsserver.setup{} -- ts/js support
 lspconfig.zls.setup{} -- zig support
 
+-- expand error message from lsp
+vim.keymap.set('n', 'gl', "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true })
 
+-- configure clipboard explicitly
+vim.opt.clipboard = "unnamedplus"
+
+-- Auto format with LSP on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = {"*.c", "*.cpp", "*.h", "*.hpp", "*.cu", "*.cuh"},
+    callback = function()
+        vim.lsp.buf.format({ async = true })  -- use LSP's built-in formatter (clangd)
+    end,
+})
+
+-- tabsize of 2 for c stuff
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = {"c", "cpp", "cu", "h", "cuh"},  -- Add filetypes here
+    callback = function()
+        vim.opt_local.tabstop = 2
+        vim.opt_local.shiftwidth = 2
+        vim.opt_local.expandtab = true
+    end,
+})
