@@ -21,9 +21,9 @@ graphviz
 guile
 htop
 icarus-verilog
+icu4c@75
 inetutils
 iproute2mac
-libgit2
 libslirp
 libusb
 lsusb
@@ -35,7 +35,6 @@ neovim
 nghttp2
 nvm
 ocaml
-ollama
 opam
 openvino
 pandoc
@@ -44,8 +43,6 @@ pnpm
 portaudio
 postgresql@14
 pyright
-python-packaging
-python-setuptools
 python-tk@3.10
 python-tk@3.11
 python@3.9

@@ -73,6 +73,8 @@ require("lazy").setup({
     -- zig language zupport
     'ziglang/zig.vim',
 
+    'nvim-lua/plenary.nvim',
+
     -- lsp and autocomplete
     {
       'neovim/nvim-lspconfig',  -- Collection of configurations for built-in LSP client
@@ -102,7 +104,20 @@ require("lazy").setup({
       end
     },
 
-    'ellisonleao/gruvbox.nvim'
+    -- js/ts auto-formatting 
+        --
+    {
+      "jose-elias-alvarez/null-ls.nvim",
+      config = function()
+        local null_ls = require("null-ls")
+        null_ls.setup({
+          sources = {
+            null_ls.builtins.formatting.prettier, -- Use Prettier for JS/TS
+          },
+        })
+      end,
+    },
+
 
     -- add more plugins here
   },
@@ -194,7 +209,7 @@ lspconfig.pyright.setup{} -- python support
 lspconfig.clangd.setup{} -- c/c++ support
 lspconfig.gopls.setup{} -- golang support
 lspconfig.lua_ls.setup{} -- lua support
-lspconfig.tsserver.setup{} -- ts/js support
+lspconfig.ts_ls.setup{} -- ts/js support
 lspconfig.zls.setup{} -- zig support
 
 -- expand error message from lsp
@@ -220,3 +235,12 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.opt_local.expandtab = true
     end,
 })
+
+-- format js and ts files on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.js", "*.ts", "*.jsx", "*.tsx" },
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
