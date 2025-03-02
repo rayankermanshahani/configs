@@ -1,3 +1,31 @@
+-- general ui
+vim.g.maplocalleader = "\\"
+vim.o.hlsearch = true
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.o.syntax = 'on'
+vim.o.number = true
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+vim.o.expandtab = true
+vim.o.autoindent = true
+vim.o.smartindent = true
+vim.o.breakindent = true
+vim.o.background = 'dark'
+vim.o.showcmd = true
+vim.o.showmatch = true
+vim.o.wildmenu = true
+vim.o.lazyredraw = true
+vim.o.ttyfast = true
+vim.cmd('highlight Comment ctermfg=DarkGray')
+vim.cmd('highlight MatchParen guibg=NONE guifg=#FFFF00 cterm=bold ctermbg=NONE ctermfg=Yellow')
+
+-- custom crosshair highlighting
+vim.o.cursorline = true
+vim.o.cursorcolumn = true
+vim.cmd('highlight CursorLine guibg=#303030 guifg=NONE cterm=NONE ctermbg=236')
+vim.cmd('highlight CursorColumn guibg=#303030 guifg=NONE cterm=NONE ctermbg=236')
+vim.cmd('highlight Cursor guibg=#303030  guifg=NONE cterm=NONE ctermbg=236')
+
 -- bootstrap lazy.nvim (PLUGIN MANAGER)
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -15,64 +43,16 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- general ui configurations
-vim.cmd("colorscheme habamax")
-vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
-
--- line numbers default
-vim.o.number = true
-
--- search highlighting 
-vim.o.hlsearch = true
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
--- displaying certain whitespace characters 
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- custom crosshair highlighting
-vim.o.cursorline = true
-vim.o.cursorcolumn = true
---vim.cmd('highlight CursorLine guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
---vim.cmd('highlight CursorColumn guibg=#F0F0F0 guifg=NONE cterm=NONE ctermbg=255')
-vim.cmd('highlight CursorLine guibg=#303030 guifg=NONE cterm=NONE ctermbg=236')
-vim.cmd('highlight CursorColumn guibg=#303030 guifg=NONE cterm=NONE ctermbg=236')
-vim.cmd('highlight Cursor guibg=#303030  guifg=NONE cterm=NONE ctermbg=236')
-
-
--- highlight matching parentheses
-vim.cmd('highlight MatchParen guibg=NONE guifg=#FFFF00 cterm=bold ctermbg=NONE ctermfg=Yellow')
-
--- additional ui tweaks
-vim.o.syntax = 'on'
-vim.o.number = true
-vim.o.tabstop = 2
-vim.o.shiftwidth = 2
-vim.o.expandtab = true
-vim.o.autoindent = true
-vim.o.smartindent = true
-vim.o.breakindent = true
-vim.o.background = 'dark'
-vim.o.showcmd = true
-vim.o.showmatch = true
-vim.o.wildmenu = true
-vim.o.lazyredraw = true
-vim.o.ttyfast = true
-vim.o.scrolloff = 10
-vim.cmd('highlight Comment ctermfg=DarkGray')
---vim.cmd('highlight Keyword ctermfg=Blue')
---vim.cmd('highlight String ctermfg=DarkGreen')
-
 -- setup lazy.nvim
 require("lazy").setup({
   spec = {
+    -- flexoki theme
+    { "nuvic/flexoki-nvim", name = "flexoki" },
+
     -- better statusline
     'vim-airline/vim-airline',
 
-    -- zig language zupport
-    'ziglang/zig.vim',
-
+    -- plenary
     'nvim-lua/plenary.nvim',
 
     -- lsp and autocomplete
@@ -97,15 +77,15 @@ require("lazy").setup({
       event = 'BufRead',
       config = function()
         require('nvim-treesitter.configs').setup {
+          ensure_installed = { "haskell" },
           highlight = {
             enable = true,
-          }
+          },
         }
       end
     },
 
     -- js/ts auto-formatting 
-        --
     {
       "jose-elias-alvarez/null-ls.nvim",
       config = function()
@@ -118,20 +98,25 @@ require("lazy").setup({
       end,
     },
 
+    { -- rust support
+      'mrcjkb/rustaceanvim',
+      version = '^5', -- Recommended
+      lazy = false, -- This plugin is already lazy
+    },
 
     -- add more plugins here
   },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { "habamax" } },
+
   -- automatically check for plugin updates
   checker = { enabled = true },
 })
 
+-- set theme
+vim.cmd("colorscheme flexoki")
+
 -- autocompletion setup
 local cmp = require'cmp'
 local luasnip = require'luasnip'
-
 cmp.setup{
   snippet = {
     expand = function(args)
@@ -188,7 +173,7 @@ cmp.setup.cmdline(':', {
   })
 })
 
--- configure lsp_signature
+-- fancy lsp_signature lol
 require'lsp_signature'.setup({
   bind = true,
   floating_window = true,
@@ -203,14 +188,13 @@ require'lsp_signature'.setup({
   }
 })
 
--- configure LSP
+-- setup lsp
 local lspconfig = require('lspconfig')
+lspconfig.lua_ls.setup{} -- lua support
 lspconfig.pyright.setup{} -- python support
 lspconfig.clangd.setup{} -- c/c++ support
-lspconfig.gopls.setup{} -- golang support
-lspconfig.lua_ls.setup{} -- lua support
 lspconfig.ts_ls.setup{} -- ts/js support
-lspconfig.zls.setup{} -- zig support
+lspconfig.hls.setup{} -- haskell support
 
 -- expand error message from lsp
 vim.keymap.set('n', 'gl', "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true })
@@ -218,7 +202,7 @@ vim.keymap.set('n', 'gl', "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap 
 -- configure clipboard explicitly
 vim.opt.clipboard = "unnamedplus"
 
--- Auto format with LSP on save
+-- format c/cpp/cu on save
 vim.api.nvim_create_autocmd("BufWritePre", {
     pattern = {"*.c", "*.cpp", "*.h", "*.hpp", "*.cu", "*.cuh"},
     callback = function()
@@ -226,17 +210,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     end,
 })
 
--- tabsize of 2 for c stuff
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = {"c", "cpp", "cu", "h", "cuh"},  -- Add filetypes here
-    callback = function()
-        vim.opt_local.tabstop = 2
-        vim.opt_local.shiftwidth = 2
-        vim.opt_local.expandtab = true
-    end,
-})
-
--- format js and ts files on save
+-- format js/ts on save
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = { "*.js", "*.ts", "*.jsx", "*.tsx" },
   callback = function()
@@ -244,3 +218,28 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
+-- format haskell on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.hs", "*.lhs", "*.cabal" },
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
+-- add haskell indentation settings
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "haskell", "lhaskell", "cabal" },
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
+    vim.opt_local.softtabstop = 2
+
+    -- haskell-specific keymaps
+    local opts = { noremap=true, silent=true, buffer=true }
+    vim.keymap.set('n', '<leader>ht', vim.lsp.buf.hover, opts)       -- show type info
+    vim.keymap.set('n', '<leader>hf', vim.lsp.buf.format, opts)      -- format code
+    vim.keymap.set('n', '<leader>hr', vim.lsp.buf.references, opts)  -- show references
+    vim.keymap.set('n', '<leader>hd', vim.lsp.buf.definition, opts)  -- go to definition
+  end,
+})

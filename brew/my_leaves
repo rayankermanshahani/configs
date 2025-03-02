@@ -1,5 +1,6 @@
 autoconf
 bat
+bear
 bfg
 bison
 btop
@@ -11,7 +12,6 @@ coreutils
 curl
 djvu2pdf
 ebook-tools
-elixir-ls
 entr
 ffmpeg
 gh
@@ -35,6 +35,7 @@ neovim
 nghttp2
 nvm
 ocaml
+ollama
 opam
 openvino
 pandoc
@@ -42,6 +43,7 @@ pgcli
 pnpm
 portaudio
 postgresql@14
+postgresql@15
 pyright
 python-tk@3.10
 python-tk@3.11
@@ -49,6 +51,8 @@ python@3.9
 quantlib
 ranger
 ripgrep
+ruff
+sfml
 six
 sloccount
 snapcraft
