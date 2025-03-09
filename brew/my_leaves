@@ -15,7 +15,6 @@ ebook-tools
 entr
 ffmpeg
 gh
-go
 gopls
 graphviz
 guile

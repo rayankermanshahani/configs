@@ -46,8 +46,9 @@ vim.opt.rtp:prepend(lazypath)
 -- setup lazy.nvim
 require("lazy").setup({
   spec = {
-    -- flexoki theme
+    -- color themes
     { "nuvic/flexoki-nvim", name = "flexoki" },
+    { "ellisonleao/gruvbox.nvim"},
 
     -- better statusline
     'vim-airline/vim-airline',
@@ -112,7 +113,8 @@ require("lazy").setup({
 })
 
 -- set theme
-vim.cmd("colorscheme flexoki")
+-- vim.cmd("colorscheme flexoki")
+vim.cmd("colorscheme gruvbox")
 
 -- autocompletion setup
 local cmp = require'cmp'
