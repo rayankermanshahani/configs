@@ -15,6 +15,9 @@ ebook-tools
 entr
 ffmpeg
 gh
+glew
+glfw
+glm
 gopls
 graphviz
 guile
@@ -27,6 +30,7 @@ libslirp
 libusb
 lsusb
 lua-language-server
+mit-scheme
 mitmproxy
 nasm
 neofetch
@@ -43,6 +47,7 @@ pnpm
 portaudio
 postgresql@14
 postgresql@15
+premake
 pyright
 python-tk@3.10
 python-tk@3.11

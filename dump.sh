@@ -8,10 +8,14 @@ command_exists() {
 # copy neovim config
 cp ~/.config/nvim/init.lua ./dots/init.lua 
 echo "copied neovim config"
-#
+
 # copy tmux config
 cp ~/.tmux.conf ./dots/.tmux.conf 
 echo "copied tmux config"
+#
+# copy tmux config
+cp ~/.zshrc ./dots/.zshrc
+echo "copied zsh config file"
 
 # Check the OS and run the appropriate package dump script
 if command_exists brew; then
