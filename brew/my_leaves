@@ -8,17 +8,20 @@ ccls
 clang-format
 cmake
 cmatrix
-coreutils
+cpp-httplib
 curl
 djvu2pdf
 ebook-tools
+elan-init
 entr
 ffmpeg
+fftw
 gh
 glew
 glfw
 glm
 gopls
+gpatch
 graphviz
 guile
 htop
@@ -55,6 +58,7 @@ python@3.9
 quantlib
 ranger
 ripgrep
+rsync
 ruff
 sfml
 six
@@ -70,6 +74,7 @@ watch
 websocat
 wget
 wireguard-tools
+yaml-cpp
 youtube-dl
 yt-dlp
 zls

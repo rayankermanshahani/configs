@@ -1,3 +1,23 @@
+-- universal indent settings: 2‑space, spaces not tabs, everywhere
+vim.opt.expandtab     = true   -- use spaces instead of real tabs
+vim.opt.shiftwidth    = 2      -- number of spaces to use for each step of (auto)indent
+vim.opt.tabstop       = 2      -- number of spaces that a <Tab> counts for
+vim.opt.softtabstop   = 2      -- number of spaces that <Tab>/<BS> uses while editing
+
+-- make sure no filetype ever overrides your above defaults
+vim.api.nvim_create_augroup('GlobalIndent', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'GlobalIndent',
+  pattern = '*',
+  callback = function()
+    -- re‑apply your 2‑space settings locally for every filetype
+    vim.opt_local.expandtab   = true
+    vim.opt_local.shiftwidth  = 2
+    vim.opt_local.tabstop     = 2
+    vim.opt_local.softtabstop = 2
+  end,
+})
+
 -- general ui
 vim.g.maplocalleader = "\\"
 vim.o.hlsearch = true
@@ -10,7 +30,7 @@ vim.o.expandtab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
 vim.o.breakindent = true
-vim.o.background = 'dark'
+-- vim.o.background = 'dark'
 vim.o.showcmd = true
 vim.o.showmatch = true
 vim.o.wildmenu = true
@@ -46,15 +66,20 @@ vim.opt.rtp:prepend(lazypath)
 -- setup lazy.nvim
 require("lazy").setup({
   spec = {
-    -- color themes
-    { "nuvic/flexoki-nvim", name = "flexoki" },
-    { "ellisonleao/gruvbox.nvim"},
+    -- color theme
+    "ellisonleao/gruvbox.nvim",
+    'maxmx03/solarized.nvim',
+
+    -- auto dark mode
+    "f-person/auto-dark-mode.nvim",
+
 
     -- better statusline
     'vim-airline/vim-airline',
 
     -- plenary
     'nvim-lua/plenary.nvim',
+
 
     -- lsp and autocomplete
     {
@@ -78,7 +103,7 @@ require("lazy").setup({
       event = 'BufRead',
       config = function()
         require('nvim-treesitter.configs').setup {
-          ensure_installed = { "haskell" },
+          ensure_installed = { "haskell", "ocaml", "python", "c", "cpp", "javascript", "typescript" },
           highlight = {
             enable = true,
           },
@@ -86,15 +111,6 @@ require("lazy").setup({
       end
     },
 
-    { -- rust support
-      'mrcjkb/rustaceanvim',
-      version = '^5', -- Recommended
-      lazy = false, -- This plugin is already lazy
-    },
-
-    { -- scheme support 
-       "Olical/conjure",
-    },
 
     -- add more plugins here
   },
@@ -104,33 +120,10 @@ require("lazy").setup({
 })
 
 -- set theme
--- vim.cmd("colorscheme flexoki")
-require("gruvbox").setup({
-  terminal_colors = true, -- add neovim terminal colors
-  undercurl = true,
-  underline = true,
-  bold = true,
-  italic = {
-    strings = true,
-    emphasis = true,
-    comments = true,
-    operators = false,
-    folds = true,
-  },
-  strikethrough = true,
-  invert_selection = false,
-  invert_signs = false,
-  invert_tabline = false,
-  invert_intend_guides = false,
-  inverse = true, -- invert background for search, diffs, statuslines and errors
-  contrast = "hard", -- can be "hard", "soft" or empty string
-  palette_overrides = {},
-  overrides = {},
-  dim_inactive = false,
-  transparent_mode = false,
-})
+require("gruvbox").setup({contrast = "hard"})
+vim.cmd("colorscheme gruvbox")
+-- vim.cmd("colorscheme solarized")
 
--- vim.cmd("colorscheme gruvbox")
 
 -- autocompletion setup
 local cmp = require'cmp'
@@ -213,6 +206,17 @@ lspconfig.pyright.setup{} -- python support
 lspconfig.clangd.setup{} -- c/c++ support
 lspconfig.ts_ls.setup{} -- ts/js support
 lspconfig.hls.setup{} -- haskell support
+lspconfig.ocamllsp.setup{} -- ocaml support
+lspconfig.rust_analyzer.setup{ -- rust support
+  settings = {
+    ['rust-analyzer'] = {
+      rustfmt = {
+        extraArgs = {"--config", "tab_spaces=2"}
+      },
+      checkOnSave = { command = "clippy" },
+    }
+  }
+}
 
 -- expand error message from lsp
 vim.keymap.set('n', 'gl', "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true })
@@ -227,6 +231,18 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         vim.lsp.buf.format({ async = true })  -- use LSP's built-in formatter (clangd)
     end,
 })
+
+-- c/c++: 2‑space indents
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {"c", "cpp"},
+  callback = function()
+    vim.opt_local.tabstop     = 2
+    vim.opt_local.shiftwidth  = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.expandtab   = true
+  end,
+})
+
 
 -- format js/ts on save
 vim.api.nvim_create_autocmd("BufWritePre", {
@@ -259,5 +275,61 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set('n', '<leader>hf', vim.lsp.buf.format, opts)      -- format code
     vim.keymap.set('n', '<leader>hr', vim.lsp.buf.references, opts)  -- show references
     vim.keymap.set('n', '<leader>hd', vim.lsp.buf.definition, opts)  -- go to definition
+  end,
+})
+
+-- Add OCaml-specific indentation settings (similar to your Haskell setup)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "ocaml", "dune", "opam", "ocamllex", "ocamlyacc", "menhir" },
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
+    vim.opt_local.softtabstop = 2
+
+    -- OCaml-specific keymaps
+    local opts = { noremap=true, silent=true, buffer=true }
+    vim.keymap.set('n', '<leader>ot', vim.lsp.buf.hover, opts)       -- show type info
+    vim.keymap.set('n', '<leader>of', vim.lsp.buf.format, opts)      -- format code
+    vim.keymap.set('n', '<leader>or', vim.lsp.buf.references, opts)  -- show references
+    vim.keymap.set('n', '<leader>od', vim.lsp.buf.definition, opts)  -- go to definition
+  end,
+})
+
+-- Add auto-formatting for OCaml files (similar to your other format-on-save setups)
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.ml", "*.mli", "*.mll", "*.mly" },
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
+-- python: 2‑space indents
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "python",
+  callback = function()
+    vim.opt_local.tabstop     = 2
+    vim.opt_local.shiftwidth  = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.expandtab   = true
+  end,
+})
+
+-- python: format on save via LSP
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.py",
+  callback = function()
+    -- format with whatever LSP/formatter you have configured
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
+
+-- format rust on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.rs",
+  callback = function()
+    -- format with whatever LSP/formatter you have configured
+    vim.lsp.buf.format({ async = false })
   end,
 })
