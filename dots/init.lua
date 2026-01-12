@@ -103,10 +103,8 @@ require("lazy").setup({
       event = 'BufRead',
       config = function()
         require('nvim-treesitter.configs').setup {
-          ensure_installed = { "haskell", "ocaml", "python", "c", "cpp", "javascript", "typescript" },
-          highlight = {
-            enable = true,
-          },
+          ensure_installed = { "haskell", "ocaml", "python", "c", "cpp", "javascript", "typescript", },
+          highlight = { enable = true },
         }
       end
     },
@@ -200,24 +198,81 @@ require'lsp_signature'.setup({
 })
 
 -- setup lsp
-local lspconfig = require('lspconfig')
-lspconfig.lua_ls.setup{} -- lua support
-lspconfig.pyright.setup{} -- python support
-lspconfig.clangd.setup{} -- c/c++ support
-lspconfig.ts_ls.setup{} -- ts/js support
-lspconfig.hls.setup{} -- haskell support
-lspconfig.ocamllsp.setup{} -- ocaml support
-lspconfig.rust_analyzer.setup{ -- rust support
+-- local lspconfig = require('lspconfig')
+-- local util = require('lspconfig.util')
+-- lspconfig.lua_ls.setup{} -- lua support
+-- lspconfig.pyright.setup{} -- python support
+-- lspconfig.clangd.setup{} -- c/c++ support
+-- lspconfig.ts_ls.setup{} -- ts/js support
+-- lspconfig.hls.setup{} -- haskell support
+-- lspconfig.ocamllsp.setup{} -- ocaml support
+-- lspconfig.rust_analyzer.setup{ -- rust support
+--   settings = {
+--     ['rust-analyzer'] = {
+--       rustfmt = {
+--         extraArgs = {"--config", "tab_spaces=2"}
+--       },
+--       checkOnSave = { command = "clippy" },
+--     }
+--   }
+-- }
+-- === LSP (Neovim 0.11+ style) ===============================================
+
+-- capabilities for nvim-cmp completion
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+-- Define per-server configs
+vim.lsp.config.lua_ls = {
+  capabilities = capabilities,
   settings = {
-    ['rust-analyzer'] = {
-      rustfmt = {
-        extraArgs = {"--config", "tab_spaces=2"}
-      },
-      checkOnSave = { command = "clippy" },
-    }
-  }
+    Lua = {
+      diagnostics = { globals = { "vim" } },
+    },
+  },
 }
 
+vim.lsp.config.pyright = {
+  capabilities = capabilities,
+}
+
+vim.lsp.config.clangd = {
+  capabilities = capabilities,
+}
+
+vim.lsp.config.ts_ls = {
+  capabilities = capabilities,
+}
+
+vim.lsp.config.hls = {
+  capabilities = capabilities,
+}
+
+vim.lsp.config.ocamllsp = {
+  capabilities = capabilities,
+}
+
+vim.lsp.config.rust_analyzer = {
+  capabilities = capabilities,
+  settings = {
+    ["rust-analyzer"] = {
+      rustfmt = { extraArgs = { "--config", "tab_spaces=2" } },
+      -- checkOnSave = { command = "clippy" },
+      checkOnSave = true,
+    },
+  },
+}
+
+-- enable all the servers configured above
+vim.lsp.enable({
+  "lua_ls",
+  "pyright",
+  "clangd",
+  "ts_ls",
+  "hls",
+  "ocamllsp",
+  "rust_analyzer",
+  "sourcekit",
+})
 -- expand error message from lsp
 vim.keymap.set('n', 'gl', "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true })
 
@@ -333,3 +388,12 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.lsp.buf.format({ async = false })
   end,
 })
+
+-- format swift on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.swift",
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
