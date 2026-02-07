@@ -4,6 +4,10 @@ vim.opt.shiftwidth    = 2      -- number of spaces to use for each step of (auto
 vim.opt.tabstop       = 2      -- number of spaces that a <Tab> counts for
 vim.opt.softtabstop   = 2      -- number of spaces that <Tab>/<BS> uses while editing
 
+-- use nvim-tree as the file explorer
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- make sure no filetype ever overrides your above defaults
 vim.api.nvim_create_augroup('GlobalIndent', { clear = true })
 vim.api.nvim_create_autocmd('FileType', {
@@ -68,17 +72,87 @@ require("lazy").setup({
   spec = {
     -- color theme
     "ellisonleao/gruvbox.nvim",
-    'maxmx03/solarized.nvim',
-
-    -- auto dark mode
-    "f-person/auto-dark-mode.nvim",
-
 
     -- better statusline
     'vim-airline/vim-airline',
 
     -- plenary
     'nvim-lua/plenary.nvim',
+
+    -- directory tree explorer
+    {
+      "nvim-tree/nvim-tree.lua",
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      config = function()
+        local api = require("nvim-tree.api")
+
+        local function on_attach(bufnr)
+          api.config.mappings.default_on_attach(bufnr)
+
+          local function opts(desc)
+            return {
+              desc = "nvim-tree: " .. desc,
+              buffer = bufnr,
+              noremap = true,
+              silent = true,
+              nowait = true,
+            }
+          end
+
+          vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
+          vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
+        end
+
+        require("nvim-tree").setup({
+          on_attach = on_attach,
+          update_focused_file = {
+            enable = true,
+          },
+          view = {
+            width = 35,
+          },
+        })
+
+        local function focus_tree_or_clear_search()
+          if api.tree.is_visible() then
+            if vim.bo.filetype == "NvimTree" then
+              vim.cmd("wincmd p")
+            else
+              api.tree.focus()
+            end
+          else
+            vim.cmd("nohlsearch")
+          end
+        end
+
+        vim.keymap.set("n", "<C-[>", focus_tree_or_clear_search, {
+          noremap = true,
+          silent = true,
+          desc = "Toggle focus between file tree and editor",
+        })
+        vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", {
+          noremap = true,
+          silent = true,
+          desc = "Toggle file tree",
+        })
+      end,
+    },
+
+    -- VSCode-like file switcher
+    {
+      "nvim-telescope/telescope.nvim",
+      dependencies = { "nvim-lua/plenary.nvim" },
+      config = function()
+        local builtin = require("telescope.builtin")
+        vim.keymap.set("n", "<C-p>", function()
+          builtin.find_files({ hidden = true })
+        end, {
+          noremap = true,
+          silent = true,
+          desc = "Search files",
+        })
+      end,
+    },
 
 
     -- lsp and autocomplete
@@ -96,19 +170,40 @@ require("lazy").setup({
       'ray-x/lsp_signature.nvim', -- Function signature hints
     },
 
+
     -- better syntax highlighting
     {
       'nvim-treesitter/nvim-treesitter',
       build = ':TSUpdate',
       event = 'BufRead',
-      config = function()
-        require('nvim-treesitter.configs').setup {
-          ensure_installed = { "haskell", "ocaml", "python", "c", "cpp", "javascript", "typescript", },
-          highlight = { enable = true },
-        }
-      end
+      main = 'nvim-treesitter',
+      opts = {
+        ensure_installed = { "python", "c", "cpp", "javascript", "typescript" },
+      },
     },
 
+
+    -- LaTeX support
+    {
+      'lervag/vimtex',
+      lazy = false,  -- don't lazy-load VimTeX
+      init = function()
+        vim.g.vimtex_view_method = 'zathura'  -- or 'skim' on macOS, 'sioyek', 'mupdf'
+        vim.g.vimtex_compiler_method = 'latexmk'
+        vim.g.vimtex_compiler_latexmk = {
+          out_dir = '',  -- or set a build dir like 'build'
+          options = {
+            '-pdf',
+            '-interaction=nonstopmode',
+            '-synctex=1',
+          },
+        }
+        vim.g.vimtex_quickfix_mode = 0  -- don't open quickfix on warnings
+      end,
+    },
+
+    -- LaTeX symbol completion for nvim-cmp
+    'kdheepak/cmp-latex-symbols',
 
     -- add more plugins here
   },
@@ -117,10 +212,105 @@ require("lazy").setup({
   checker = { enabled = true },
 })
 
--- set theme
-require("gruvbox").setup({contrast = "hard"})
-vim.cmd("colorscheme gruvbox")
--- vim.cmd("colorscheme solarized")
+-- set theme: Campbell (Windows Terminal default)
+vim.o.termguicolors = true
+
+local function set_campbell()
+  local c = {
+    bg = "#0C0C0C",
+    fg = "#CCCCCC",
+    cursor = "#FFFFFF",
+    black = "#0C0C0C",
+    red = "#C50F1F",
+    green = "#13A10E",
+    yellow = "#C19C00",
+    blue = "#0037DA",
+    magenta = "#881798",
+    cyan = "#3A96DD",
+    white = "#CCCCCC",
+    bright_black = "#767676",
+    bright_red = "#E74856",
+    bright_green = "#16C60C",
+    bright_yellow = "#F9F1A5",
+    bright_blue = "#3B78FF",
+    bright_magenta = "#B4009E",
+    bright_cyan = "#61D6D6",
+    bright_white = "#F2F2F2",
+    line = "#2A2D2E",
+    visual = "#3A3D41",
+    comment = "#767676",
+  }
+
+  vim.g.colors_name = "campbell"
+  vim.o.background = "dark"
+
+  vim.g.terminal_color_0 = c.black
+  vim.g.terminal_color_1 = c.red
+  vim.g.terminal_color_2 = c.green
+  vim.g.terminal_color_3 = c.yellow
+  vim.g.terminal_color_4 = c.blue
+  vim.g.terminal_color_5 = c.magenta
+  vim.g.terminal_color_6 = c.cyan
+  vim.g.terminal_color_7 = c.white
+  vim.g.terminal_color_8 = c.bright_black
+  vim.g.terminal_color_9 = c.bright_red
+  vim.g.terminal_color_10 = c.bright_green
+  vim.g.terminal_color_11 = c.bright_yellow
+  vim.g.terminal_color_12 = c.bright_blue
+  vim.g.terminal_color_13 = c.bright_magenta
+  vim.g.terminal_color_14 = c.bright_cyan
+  vim.g.terminal_color_15 = c.bright_white
+
+  local set = vim.api.nvim_set_hl
+  set(0, "Normal", { fg = c.fg, bg = c.bg })
+  set(0, "NormalNC", { fg = c.fg, bg = c.bg })
+  set(0, "Comment", { fg = c.comment, italic = true })
+  set(0, "Constant", { fg = c.cyan })
+  set(0, "String", { fg = c.yellow })
+  set(0, "Character", { fg = c.yellow })
+  set(0, "Number", { fg = c.bright_magenta })
+  set(0, "Boolean", { fg = c.bright_magenta, bold = true })
+  set(0, "Identifier", { fg = c.bright_blue })
+  set(0, "Function", { fg = c.bright_cyan })
+  set(0, "Statement", { fg = c.bright_red })
+  set(0, "Keyword", { fg = c.bright_red })
+  set(0, "Type", { fg = c.bright_green })
+  set(0, "PreProc", { fg = c.magenta })
+  set(0, "Special", { fg = c.bright_yellow })
+  set(0, "Operator", { fg = c.fg })
+  set(0, "Delimiter", { fg = c.fg })
+  set(0, "Error", { fg = c.bright_white, bg = c.red })
+  set(0, "Todo", { fg = c.bg, bg = c.yellow, bold = true })
+
+  set(0, "Cursor", { fg = c.bg, bg = c.cursor })
+  set(0, "CursorLine", { bg = c.line })
+  set(0, "CursorColumn", { bg = c.line })
+  set(0, "LineNr", { fg = c.bright_black })
+  set(0, "CursorLineNr", { fg = c.bright_white, bold = true })
+  set(0, "SignColumn", { bg = c.bg })
+  set(0, "ColorColumn", { bg = c.line })
+  set(0, "VertSplit", { fg = c.line, bg = c.bg })
+  set(0, "WinSeparator", { fg = c.line, bg = c.bg })
+
+  set(0, "Visual", { bg = c.visual })
+  set(0, "Search", { fg = c.bg, bg = c.bright_yellow })
+  set(0, "IncSearch", { fg = c.bg, bg = c.bright_cyan })
+  set(0, "Pmenu", { fg = c.fg, bg = c.line })
+  set(0, "PmenuSel", { fg = c.bg, bg = c.blue })
+  set(0, "StatusLine", { fg = c.fg, bg = c.line })
+  set(0, "StatusLineNC", { fg = c.bright_black, bg = c.line })
+
+  set(0, "DiagnosticError", { fg = c.bright_red })
+  set(0, "DiagnosticWarn", { fg = c.bright_yellow })
+  set(0, "DiagnosticInfo", { fg = c.bright_blue })
+  set(0, "DiagnosticHint", { fg = c.bright_cyan })
+  set(0, "DiagnosticVirtualTextError", { fg = c.bright_red, bg = c.bg })
+  set(0, "DiagnosticVirtualTextWarn", { fg = c.bright_yellow, bg = c.bg })
+  set(0, "DiagnosticVirtualTextInfo", { fg = c.bright_blue, bg = c.bg })
+  set(0, "DiagnosticVirtualTextHint", { fg = c.bright_cyan, bg = c.bg })
+end
+
+set_campbell()
 
 
 -- autocompletion setup
@@ -160,6 +350,7 @@ cmp.setup{
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'latex_symbols', option = { strategy = 0 } },
   }, {
     { name = 'buffer' },
     { name = 'path' },
@@ -197,27 +388,6 @@ require'lsp_signature'.setup({
   }
 })
 
--- setup lsp
--- local lspconfig = require('lspconfig')
--- local util = require('lspconfig.util')
--- lspconfig.lua_ls.setup{} -- lua support
--- lspconfig.pyright.setup{} -- python support
--- lspconfig.clangd.setup{} -- c/c++ support
--- lspconfig.ts_ls.setup{} -- ts/js support
--- lspconfig.hls.setup{} -- haskell support
--- lspconfig.ocamllsp.setup{} -- ocaml support
--- lspconfig.rust_analyzer.setup{ -- rust support
---   settings = {
---     ['rust-analyzer'] = {
---       rustfmt = {
---         extraArgs = {"--config", "tab_spaces=2"}
---       },
---       checkOnSave = { command = "clippy" },
---     }
---   }
--- }
--- === LSP (Neovim 0.11+ style) ===============================================
-
 -- capabilities for nvim-cmp completion
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
@@ -243,14 +413,6 @@ vim.lsp.config.ts_ls = {
   capabilities = capabilities,
 }
 
-vim.lsp.config.hls = {
-  capabilities = capabilities,
-}
-
-vim.lsp.config.ocamllsp = {
-  capabilities = capabilities,
-}
-
 vim.lsp.config.rust_analyzer = {
   capabilities = capabilities,
   settings = {
@@ -262,16 +424,31 @@ vim.lsp.config.rust_analyzer = {
   },
 }
 
+vim.lsp.config.texlab = {
+  capabilities = capabilities,
+  settings = {
+    texlab = {
+      build = {
+        executable = 'latexmk',
+        args = { '-pdf', '-interaction=nonstopmode', '-synctex=1', '%f' },
+        onSave = false,  -- VimTeX handles this
+      },
+      forwardSearch = {
+        executable = 'zathura',
+        args = { '--synctex-forward', '%l:1:%f', '%p' },
+      },
+    },
+  },
+}
+
 -- enable all the servers configured above
 vim.lsp.enable({
   "lua_ls",
   "pyright",
   "clangd",
   "ts_ls",
-  "hls",
-  "ocamllsp",
   "rust_analyzer",
-  "sourcekit",
+  "texlab",
 })
 -- expand error message from lsp
 vim.keymap.set('n', 'gl', "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true })
@@ -307,58 +484,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- format haskell on save
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = { "*.hs", "*.lhs", "*.cabal" },
-  callback = function()
-    vim.lsp.buf.format({ async = false })
-  end,
-})
-
--- add haskell indentation settings
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "haskell", "lhaskell", "cabal" },
-  callback = function()
-    vim.opt_local.tabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.expandtab = true
-    vim.opt_local.softtabstop = 2
-
-    -- haskell-specific keymaps
-    local opts = { noremap=true, silent=true, buffer=true }
-    vim.keymap.set('n', '<leader>ht', vim.lsp.buf.hover, opts)       -- show type info
-    vim.keymap.set('n', '<leader>hf', vim.lsp.buf.format, opts)      -- format code
-    vim.keymap.set('n', '<leader>hr', vim.lsp.buf.references, opts)  -- show references
-    vim.keymap.set('n', '<leader>hd', vim.lsp.buf.definition, opts)  -- go to definition
-  end,
-})
-
--- Add OCaml-specific indentation settings (similar to your Haskell setup)
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "ocaml", "dune", "opam", "ocamllex", "ocamlyacc", "menhir" },
-  callback = function()
-    vim.opt_local.tabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.expandtab = true
-    vim.opt_local.softtabstop = 2
-
-    -- OCaml-specific keymaps
-    local opts = { noremap=true, silent=true, buffer=true }
-    vim.keymap.set('n', '<leader>ot', vim.lsp.buf.hover, opts)       -- show type info
-    vim.keymap.set('n', '<leader>of', vim.lsp.buf.format, opts)      -- format code
-    vim.keymap.set('n', '<leader>or', vim.lsp.buf.references, opts)  -- show references
-    vim.keymap.set('n', '<leader>od', vim.lsp.buf.definition, opts)  -- go to definition
-  end,
-})
-
--- Add auto-formatting for OCaml files (similar to your other format-on-save setups)
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = { "*.ml", "*.mli", "*.mll", "*.mly" },
-  callback = function()
-    vim.lsp.buf.format({ async = false })
-  end,
-})
-
 -- python: 2‑space indents
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "python",
@@ -388,12 +513,3 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.lsp.buf.format({ async = false })
   end,
 })
-
--- format swift on save
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.swift",
-  callback = function()
-    vim.lsp.buf.format({ async = false })
-  end,
-})
-
