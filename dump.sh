@@ -17,6 +17,17 @@ echo "copied tmux config"
 cp ~/.zshrc ./dots/.zshrc
 echo "copied zsh config file"
 
+# copy helix config
+mkdir -p ./dots/helix
+cp ~/.config/helix/config.toml ./dots/helix/config.toml
+cp ~/.config/helix/languages.toml ./dots/helix/languages.toml
+echo "copied helix config"
+
+# copy omp agent config
+mkdir -p ./dots/omp/agent
+cp ~/.omp/agent/config.yml ./dots/omp/agent/config.yml
+echo "copied omp agent config"
+
 # Check the OS and run the appropriate package dump script
 if command_exists brew; then
     ./macos_dump.sh

@@ -1,0 +1,5 @@
+# theme = "gruvbox"
+theme = "gruvbox_light"
+
+[editor]
+soft-wrap.enable = true
